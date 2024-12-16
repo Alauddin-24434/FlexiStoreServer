@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Add your PostgreSQL connection string here
+}
+
+enum Role {
+  ADMIN
+  VENDOR
+  USER
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  password      String
+  role          Role     @default(USER) // Enum for role with a default value
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  shops         Shop[]
+  orders        Order[]
+}
+
+model Shop {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  logo        String?
+  description String
+  vendorId    Int
+  vendor      User     @relation(fields: [vendorId], references: [id])
+  products    Product[]
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String 
+  price       Float
+  category    String
+  stock       Int
+  imageUrl    String
+  discount    Float    @default(0.0)
+  shopId      Int
+  shop        Shop     @relation(fields: [shopId], references: [id])
+  orders      OrderProduct[]
+}
+
+model Order {
+  id             Int              @id @default(autoincrement())
+  userId         Int
+  user           User             @relation(fields: [userId], references: [id])
+  createdAt      DateTime         @default(now())
+  status         OrderStatus      // Enum for status
+  totalPrice     Float
+  orderProducts  OrderProduct[]
+}
+
+model OrderProduct {
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  order      Order    @relation(fields: [orderId], references: [id])
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  price      Float
+}
