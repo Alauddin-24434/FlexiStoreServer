@@ -12,7 +12,7 @@ async function main() {
       console.log(`App is listening on port ${port}`);
     });
 
-    // Handle graceful shutdo
+    // Handle graceful shutdown
     process.on("SIGTERM", () => {
       console.log("SIGTERM signal received: closing HTTP server");
       server.close(() => {
