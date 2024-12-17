@@ -13,7 +13,10 @@ dotenv.config();
 const app: Application = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin:["https://flexi-store-front-end.vercel.app","http://localhost:3000"],
+  credentials:true,
+}));
 app.use(express.json()); // For JSON payloads
 app.use(express.urlencoded({ extended: true })); // For URL-encoded payloads
 app.use(cookieParser()); // To parse cookies

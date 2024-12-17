@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL") // Add your PostgreSQL connection string here
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -44,16 +45,26 @@ model Shop {
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
-  description String 
+  description String
   price       Float
   category    String
   stock       Int
   imageUrl    String
-  discount    Float    @default(0.0)
+  discount    Float    @default(0.0)  // Regular discount, if any
+  
+  // Flash Sale Fields
+  flashSaleIsActive Boolean @default(false)  // Whether flash sale is active
+  flashSaleDiscount Float  @default(0)      // Discount during flash sale
+  flashSaleStartTime DateTime?                // Start time of flash sale
+  flashSaleEndTime DateTime?                  // End time of flash sale
+
   shopId      Int
   shop        Shop     @relation(fields: [shopId], references: [id])
   orders      OrderProduct[]
+
+  @@index([flashSaleIsActive])  // Index for performance if needed
 }
+
 
 model Order {
   id             Int              @id @default(autoincrement())

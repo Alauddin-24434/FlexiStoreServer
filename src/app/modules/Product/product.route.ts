@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { createProduct } from "./product.controller";
+import { createProduct, getAllProducts, getProductById } from "./product.controller";
 
+const router = Router();
 
+// Create a new product
+router.post("/create-product", createProduct);
 
-const router= Router();
-
-// register
-router.post('/create-product', createProduct)
-
-
-export const productRoutes= router; 
+// Get all products with filtering, pagination, and sorting
+router.get("/products", getAllProducts);
+router.get("/products/:id", getProductById);  // Get a product by ID
+export const productRoutes = router;
