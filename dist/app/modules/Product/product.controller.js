@@ -61,7 +61,7 @@ const getProductById = (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const { id } = req.params;
         // Fetch the product by ID using the service function
-        const product = yield (0, product_service_1.findProductById)(Number(id));
+        const product = yield (0, product_service_1.findProductById)(id);
         // If the product is found, return the product details
         res.status(200).json({
             success: true,

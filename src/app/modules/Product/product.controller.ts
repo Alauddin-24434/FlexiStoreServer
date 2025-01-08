@@ -31,7 +31,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
     
 
     // Fetch products using the service function
-    const result = await findAllProductsInoDb(filter, page, limit, );
+    const result = await findAllProductsInoDb(page,limit, filter, category, setFlagsFromString, search );
 
     // Send successful response
     res.status(200).json({
@@ -59,7 +59,7 @@ export const getProductById = async (req: Request, res: Response) => {
     
 
     // Fetch the product by ID using the service function
-    const product = await findProductById(Number(id));
+    const product = await findProductById(id);
 
     // If the product is found, return the product details
     res.status(200).json({

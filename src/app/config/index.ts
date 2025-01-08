@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import { access } from 'fs';
 
 // Load environment variables from the .env file
 dotenv.config();

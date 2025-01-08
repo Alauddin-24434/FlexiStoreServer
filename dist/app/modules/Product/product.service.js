@@ -41,7 +41,8 @@ const createProductIntoDb = (payload) => __awaiter(void 0, void 0, void 0, funct
             description: payload.description,
             price: payload.price,
             stock: payload.stock,
-            imageUrl: payload.imageUrl, // Assuming imageUrl is optional
+            thumbnailImage: payload.thumbnailImage,
+            additionalImages: payload.additionalImages,
             discount: (_a = payload.discount) !== null && _a !== void 0 ? _a : 0.0, // Default discount to 0.0 if not provided
             shopId: payload.shopId, // Link the product to the shop
             flashSaleIsActive: (_b = payload.flashSaleIsActive) !== null && _b !== void 0 ? _b : false, // Whether the flash sale is active (defaults to false)
@@ -91,6 +92,10 @@ const findProductById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const product = yield prismaClient_1.prisma.product.findFirst({
         where: {
             id: id, // The unique ID of the product
+        },
+        include: {
+            // Optionally include related data
+            shop: true, // Include products if your shop has a relation with products
         },
     });
     // If the product doesn't exist, return null or throw an error based on your preference

@@ -36,7 +36,8 @@ export const createProductIntoDb = async (payload: Product) => {
       description: payload.description,
       price: payload.price,
       stock: payload.stock,
-      imageUrl: payload.imageUrl, // Assuming imageUrl is optional
+      thumbnailImage: payload.thumbnailImage,
+      additionalImages: payload.additionalImages,
       discount: payload.discount ?? 0.0, // Default discount to 0.0 if not provided
       shopId: payload.shopId, // Link the product to the shop
       flashSaleIsActive: payload.flashSaleIsActive ?? false, // Whether the flash sale is active (defaults to false)
@@ -73,6 +74,7 @@ export const findAllProductsInoDb = async (
       // Dynamic filtering logic
       ...filter,
     },
+    
     skip, // Pagination offset
     take: resultsPerPage, // Limit the results
 
@@ -99,12 +101,17 @@ export const findAllProductsInoDb = async (
 
 
 // Find a product by ID
-export const findProductById = async (id:number) => {
+export const findProductById = async (id:string) => {
   console.log(id)
   // Fetch the product with the given ID
   const product = await prisma.product.findFirst({
     where: {
       id: id, // The unique ID of the product
+    },
+    include: {
+      // Optionally include related data
+      shop: true, // Include products if your shop has a relation with products
+      
     },
   });
 

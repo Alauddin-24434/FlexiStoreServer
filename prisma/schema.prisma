@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL") // Add your PostgreSQL connection string here
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // Add your PostgreSQL connection string here
   directUrl = env("DIRECT_URL")
 }
 
@@ -21,67 +21,85 @@ enum OrderStatus {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  name          String
-  email         String   @unique
-  password      String
-  role          Role     @default(USER) // Enum for role with a default value
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  shops         Shop[]
-  orders        Order[]
+  id        String   @id @default(cuid()) // Change to String with cuid()
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER) // Enum for role with a default value
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  shops     Shop[]   // Relation to shops
+  orders    Order[]  // Relation to orders
+  flowShops Shop[]   @relation("UserFollowedShops") // User's followed shops
 }
 
 model Shop {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(cuid()) // Change to String with cuid()
   name        String   @unique
   logo        String?
   description String
-  vendorId    Int
+  vendorId    String   // Change to String for consistency
   vendor      User     @relation(fields: [vendorId], references: [id])
-  products    Product[]
+  products    Product[] // Relation to products
+  followers   User[]    @relation("UserFollowedShops") // Shops followed by users
 }
 
+
+
+
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  price       Float
-  category    String
-  stock       Int
-  imageUrl    String
-  discount    Float    @default(0.0)  // Regular discount, if any
-  
+  id               String         @id @default(cuid()) // Unique identifier
+  name             String         // Name of the product
+  description      String         // Description of the product
+  price            Float          // Price of the product
+  category         String         // Category of the product
+  stock            Int            // Stock availability
+  thumbnailImage   String         // Thumbnail image of the product
+  additionalImages String[]       // Array of additional images
+  discount         Float          @default(0.0) // Regular discount, default 0
+
   // Flash Sale Fields
-  flashSaleIsActive Boolean @default(false)  // Whether flash sale is active
-  flashSaleDiscount Float  @default(0)      // Discount during flash sale
-  flashSaleStartTime DateTime?                // Start time of flash sale
-  flashSaleEndTime DateTime?                  // End time of flash sale
+  flashSaleIsActive  Boolean      @default(false) // Whether flash sale is active
+  flashSaleDiscount  Float        @default(0.0) // Discount during flash sale
+  flashSaleStartTime DateTime?    // Start time of flash sale
+  flashSaleEndTime   DateTime?    // End time of flash sale
 
-  shopId      Int
-  shop        Shop     @relation(fields: [shopId], references: [id])
-  orders      OrderProduct[]
+  shopId            String        // Foreign key to the Shop
+  shop              Shop          @relation(fields: [shopId], references: [id]) // Relation to Shop
+  orders            OrderProduct[] // Relation to orders
 
-  @@index([flashSaleIsActive])  // Index for performance if needed
+  // New fields for reviews and ratings
+  reviews           Review[]      // Relation to the Review model
+  averageRating     Float         @default(0.0) // Average rating for the product
+}
+
+model Review {
+  id          String   @id @default(cuid()) // Unique identifier for the review
+  userId      String   // Foreign key to the User
+  productId   String   // Foreign key to the Product
+  product     Product  @relation(fields: [productId], references: [id]) // Relation to Product
+  comment     String   // Review comment
+  rating      Int      // Rating given by the user (e.g., 1 to 5)
+  createdAt   DateTime @default(now()) // Timestamp when the review was created
 }
 
 
 model Order {
-  id             Int              @id @default(autoincrement())
-  userId         Int
-  user           User             @relation(fields: [userId], references: [id])
-  createdAt      DateTime         @default(now())
-  status         OrderStatus      // Enum for status
-  totalPrice     Float
-  orderProducts  OrderProduct[]
+  id            String       @id @default(cuid()) // Change to String with cuid()
+  userId        String       // Change to String for consistency
+  user          User         @relation(fields: [userId], references: [id])
+  createdAt     DateTime     @default(now())
+  status        OrderStatus // Enum for status
+  totalPrice    Float
+  orderProducts OrderProduct[] // Relation to OrderProduct
 }
 
 model OrderProduct {
-  id         Int      @id @default(autoincrement())
-  orderId    Int
-  order      Order    @relation(fields: [orderId], references: [id])
-  productId  Int
-  product    Product  @relation(fields: [productId], references: [id])
-  quantity   Int
-  price      Float
+  id        String   @id @default(cuid()) // Change to String with cuid()
+  orderId   String   // Change to String for consistency
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String   // Change to String for consistency
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
 }
